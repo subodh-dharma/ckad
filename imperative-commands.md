@@ -205,6 +205,21 @@
     </p>
     </details>
 
+    f. Create a deployment and edit a deployment immidiately after creating
+
+    ```bash
+    $ k create deploy dep8 --image nginx  -o yaml | k edit -f -
+    ``` 
+
+    <details>
+    <summary>Output</summary>
+    <p>
+
+    This opens a editor after creating a deployment of nginx with 1 replica. In the editor you can update the deployment defintion file and save it.
+    This will save and update the deployment on the server.
+    </p>
+    </details>
+
 
 ## ConfigMaps
 
@@ -246,6 +261,7 @@
     <details>
     <summary>Output</summary>
     <p>
+
     ```bash
     $ k get cm cm2 -o yaml
     apiVersion: v1
@@ -273,6 +289,7 @@
     <details>
     <summary>Output</summary>
     <p>
+
     $ k get cm cm3 -o yaml
     apiVersion: v1
     data:
@@ -477,3 +494,352 @@
     ```
     </p>
     </details>
+
+## Job
+
+1. Imperative commands to create Job
+
+    a. create simple job with an image
+
+    ```bash
+    $ k create job job1 --image busybox
+    job.batch/job1 created
+    ``` 
+    <details>
+    <summary>Output</summary>
+    <p>
+
+    ```bash
+    $ k describe job job1
+    Name:           job1
+    Namespace:      default
+    Selector:       controller-uid=5e67e78a-b761-4b11-b59c-09f7f9b73db1
+    Labels:         controller-uid=5e67e78a-b761-4b11-b59c-09f7f9b73db1
+                    job-name=job1
+    Annotations:    <none>
+    Parallelism:    1
+    Completions:    1
+    Start Time:     Sun, 30 Aug 2020 09:29:51 -0700
+    Completed At:   Sun, 30 Aug 2020 09:29:54 -0700
+    Duration:       3s
+    Pods Statuses:  0 Running / 1 Succeeded / 0 Failed
+    Pod Template:
+    Labels:  controller-uid=5e67e78a-b761-4b11-b59c-09f7f9b73db1
+            job-name=job1
+    Containers:
+    job1:
+        Image:        busybox
+        Port:         <none>
+        Host Port:    <none>
+        Environment:  <none>
+        Mounts:       <none>
+    Volumes:        <none>
+    Events:
+    Type    Reason            Age   From            Message
+    ----    ------            ----  ----            -------
+    Normal  SuccessfulCreate  34s   job-controller  Created pod: job1-bwhs7
+    Normal  Completed         31s   job-controller  Job completed
+    ```
+
+    </p>
+    </details>
+
+
+    b. create simple job with an image and a command
+
+    ```bash
+    $ k create job job2 --image busybox -- sleep 500
+    job.batch/job2 created
+    ``` 
+    <details>
+    <summary>Output</summary>
+    <p>
+
+    ```bash
+    $ k describe job job2
+    Name:           job2
+    Namespace:      default
+    Selector:       controller-uid=cb2a52ec-c489-48f2-b315-97d39139f85b
+    Labels:         controller-uid=cb2a52ec-c489-48f2-b315-97d39139f85b
+                    job-name=job2
+    Annotations:    <none>
+    Parallelism:    1
+    Completions:    1
+    Start Time:     Sun, 30 Aug 2020 09:39:43 -0700
+    Pods Statuses:  1 Running / 0 Succeeded / 0 Failed
+    Pod Template:
+    Labels:  controller-uid=cb2a52ec-c489-48f2-b315-97d39139f85b
+            job-name=job2
+    Containers:
+    job2:
+        Image:      busybox
+        Port:       <none>
+        Host Port:  <none>
+        Command:
+        sleep
+        500
+        Environment:  <none>
+        Mounts:       <none>
+    Volumes:        <none>
+    Events:
+    Type    Reason            Age   From            Message
+    ----    ------            ----  ----            -------
+    Normal  SuccessfulCreate  18s   job-controller  Created pod: job2-bkjq5
+    ```
+
+    </p>
+    </details>
+
+
+## Service (again!)
+
+1. You can create service objects using another kubectl command i.e. `expose`
+
+   a. Expose a deployment (or RS, Pod, RC) using the `expose` command to create a service object.
+
+   ```bash
+   $ k expose deploy/dep2 --port 8080 --target-port 8080 --name dep-port --protocol TCP
+   service/dep-port exposed
+   ```
+    <details>
+    <summary>Output</summary>
+    <p>
+
+    ```bash
+    $ k describe svc dep-port
+    Name:              dep-port
+    Namespace:         default
+    Labels:            app=dep2
+    Annotations:       <none>
+    Selector:          app=dep2
+    Type:              ClusterIP
+    IP:                10.0.244.204
+    Port:              <unset>  8080/TCP
+    TargetPort:        8080/TCP
+    Endpoints:         10.244.0.5:8080,10.244.0.6:8080,10.244.1.7:8080 + 1 more...
+    Session Affinity:  None
+    Events:            <none>
+    ```
+
+    </p>
+    </details>
+
+   b. This command is also used to expose an existing service. This command helps to create a new service from an existing service by using the label selectors in the source service. You can expose new ports. Ideal scenario can be to expose one service for `https` and on for `http` without creating a new service from scratch.
+
+   ```bash
+    $ k expose service svc2 --name svc5 --port 8899 --target-port 9090 
+    service/svc5 exposed
+   ```
+    <details>
+    <summary>Output</summary>
+    <p>
+
+    ```bash
+    $ k describe svc svc2
+    Name:              svc2
+    Namespace:         default
+    Labels:            app=svc2
+    Annotations:       <none>
+    Selector:          app=svc2
+    Type:              ClusterIP
+    IP:                10.0.192.189
+    Port:              9090-8080  9090/TCP
+    TargetPort:        8080/TCP
+    Endpoints:         <none>
+    Session Affinity:  None
+    Events:            <none>
+
+    $ k describe svc svc5
+    Name:              svc5
+    Namespace:         default
+    Labels:            app=svc2
+    Annotations:       <none>
+    Selector:          app=svc2
+    Type:              ClusterIP
+    IP:                10.0.9.180
+    Port:              <unset>  8899/TCP
+    TargetPort:        9090/TCP
+    Endpoints:         <none>
+    Session Affinity:  None
+    Events:            <none>
+    ```
+
+    </p>
+    </details>
+
+# Labels
+
+  1. Use the following commands to assign labels to resources. You can assign new labels, reassing values and remove label for these resources.
+
+   a. Assign labels
+
+   ```bash
+    $ k label pod nginx app=nginx env=dev
+    pod/nginx labeled
+   ```
+
+   b. Overwrite / Reassign values to the labels
+
+   ```bash
+    $ k label pod nginx --overwrite env=qa
+    pod/nginx labeled
+   ```
+
+   <details>
+   <summary>Output</summary>
+   <p>
+
+   ```bash
+    $ k get po --selector run=nginx --show-labels
+    NAME    READY   STATUS    RESTARTS   AGE   LABELS
+    nginx   1/1     Running   0          24h   app=nginx,env=qa,run=nginx
+   ```
+
+   </p>
+   </details>
+
+
+   c. Remove existing labels from a resource
+
+   ```bash
+   $ k label pod nginx env-
+   pod/nginx labeled
+   ```
+
+   <details>
+   <summary>Output</summary>
+   <p>
+
+   ```bash
+    $ k get po --selector run=nginx --show-labels
+    NAME    READY   STATUS    RESTARTS   AGE   LABELS
+    nginx   1/1     Running   0          24h   app=nginx,run=nginx
+   ```
+
+   </p>
+   </details>
+
+
+# Environment Variables (A shortcut!)
+
+ 1. Use `kubectl set env ` command to set the environment variable to pod templates of the resources like _deploy, rs, rc, job_
+
+    a. Set new env on a pod
+
+    ```bash
+    $ k set env deploy dep1 LOG_DIR=/var/log
+    deployment.apps/dep1 env updated
+    ```
+
+    <details>
+    <summary>Output</summary>
+    <p>
+
+    ```bash
+        $ k describe deploy dep1
+        Name:                   dep1
+        Namespace:              default
+        CreationTimestamp:      Sat, 29 Aug 2020 15:07:55 -0700
+        Labels:                 app=dep1
+        Annotations:            deployment.kubernetes.io/revision: 2
+        Selector:               app=dep1
+        Replicas:               1 desired | 1 updated | 1 total | 1 available | 0 unavailable
+        StrategyType:           RollingUpdate
+        MinReadySeconds:        0
+        RollingUpdateStrategy:  25% max unavailable, 25% max surge
+        Pod Template:
+        Labels:  app=dep1
+        Containers:
+        nginx:
+            Image:      nginx
+            Port:       <none>
+            Host Port:  <none>
+            Environment:
+            LOG_DIR:  /var/log
+            Mounts:     <none>
+        Volumes:      <none>
+    ```
+
+    </p>
+    </details>
+
+    By repeated applying new env variables the list of ENV can be extended.
+
+    b. To replace an existing env variable value
+
+    ```bash
+    $ k set env deploy dep1 --overwrite ENV=qa
+    deployment.apps/dep1 env updated
+    ```
+
+    This will reassign the value for existing ENV variable `ENV`. If it doesn't exists it will create a new environment variable.
+
+    c. To delete any existing env variable
+
+    ```bash
+    $ k set env deploy dep1 ENV-
+    deployment.apps/dep1 env updated
+    ```
+
+    d. To update any specific container in a multi-container pod, use `--containers` flag
+
+    ```bash
+    $ k set env deploy dep1 --containers nginx-backup BACKUP=false
+    deployment.apps/dep1 env updated
+    ```
+
+# Node Taints
+
+  1. There are some questions which ask to schedule a pod/deployment on a specific node. In that case the node taints are useful.
+  2. Node Taints along with Pod Tolerations are used to schedule pods on a specific node.
+
+     a. To add a taint to any node
+
+     ```bash
+     $ k taint node aks-agentpool-27254894-vmss00000 nginxonly=yes:NoSchedule
+     node/aks-agentpool-27254894-vmss000000 tainted
+     ```
+
+     <details>
+     <summary>Output</summary>
+     <p>
+
+     ```bash
+        $ k describe node aks-agentpool-27254894-vmss000000
+        Name:               aks-agentpool-27254894-vmss000000
+        Roles:              agent
+        Labels:             agentpool=agentpool
+        Annotations:        node.alpha.kubernetes.io/ttl: 0
+                            volumes.kubernetes.io/controller-managed-attach-detach: true
+        CreationTimestamp:  Sat, 29 Aug 2020 13:57:16 -0700
+        Taints:             nginxonly=yes:NoSchedule
+        Unschedulable:      false
+        Lease:
+
+     ```
+
+     </p>
+     </details>
+
+     A pod can be scheduled, but not guaranteed, on this node if it has appropriate tolerations like following:
+
+     ```yaml
+        apiVersion: v1
+        kind: Pod
+        metadata:
+        labels:
+            app: nginx
+            run: nginx
+        name: nginx-tainted
+        namespace: default
+        spec:
+        containers:
+            - image: nginx
+            imagePullPolicy: Always
+            name: nginx
+        restartPolicy: Always
+        tolerations:
+            - effect: "NoSchedule"
+            key: "nginxonly"
+            operator: "Exists"
+     ```
