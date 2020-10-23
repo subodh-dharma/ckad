@@ -37,3 +37,7 @@ To practice the imperative commands I highly recommend going through the exercis
      Most of the questions here can be covered using the kubectl commands. There are very few questions which need additional configuration after you create a resource or use `--dry-run` option to add those configuration fields.
 
      The same questions are available in a [Medium Blog](https://medium.com/bb-tutorials-and-thoughts/practice-enough-with-these-questions-for-the-ckad-exam-2f42d1228552) by same author as this repo. 
+
+1. [zealvora/certified-kubernetes-application-developer](https://github.com/zealvora/certified-kubernetes-application-developer/tree/master/practice-tests)
+
+      This repo offers some basic questions to practice kubernetes skills required for CKAD exam prep. You can go through this set of questions to just get the gist of types of questions that will be asked. Although all the questions aren't as challenging as one can expect they cover all the sections of the syllabus.
