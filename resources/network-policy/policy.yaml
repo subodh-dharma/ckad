@@ -1,0 +1,105 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: auth-policy
+spec:
+  podSelector:
+    matchLabels:
+      run: auth
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              run: "backend"
+        - podSelector:
+            matchLabels:
+              run: "db"
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              run: "backend"
+        - podSelector:
+            matchLabels:
+              run: "db"
+
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: backend-policy
+spec:
+  podSelector:
+    matchLabels:
+      run: backend
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              run: "frontend"
+        - podSelector:
+            matchLabels:
+              run: "auth"
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              run: "frontend"
+        - podSelector:
+            matchLabels:
+              run: "auth"
+        - podSelector:
+            matchLabels:
+              run: "db"
+
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: db-policy
+spec:
+  podSelector:
+    matchLabels:
+      run: db
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              run: "backend"
+        - podSelector:
+            matchLabels:
+              run: "auth"
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              run: "backend"
+        - podSelector:
+            matchLabels:
+              run: "auth"
+
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: frontend-policy
+spec:
+  podSelector:
+    matchLabels:
+      run: frontend
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              run: "backend"
+        - podSelector:
+            matchLabels:
+              run: "auth"
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              run: "backend"
+        - podSelector:
+            matchLabels:
+              run: "auth"
