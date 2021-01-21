@@ -2,17 +2,11 @@
 
 CNCF CKAD prep material and resources
 
-Preparation for CKAD for Kubernetes v1.19
-
-Kubernetes versions:
-
-- Kubernetes server: 1.19
-- kubectl: 1.19
-
 Contents:
 
 - **[Imperative Commands](./imperative-commands.md)** - kubectl CLI commands to deploy resources and perform certain operations without creating a resource file.
 - **[Rapid Fire](./rapid-practice-tests.md)** - a list of problem statements to solve the problems rapidly. This list of problems will help you check your speed for executing simple tasks. Most of the tasks can be achieved using imperative commands. Some questions are interdependent. I would recommend to solve questions in the given order. Allocate a maximum of 1.5 minutes to each question.
+- **[Bookmarks](./resources/files/ckad_bookmarks.html)** -- You can import this bookmarks folder for your exam. Also this is a faster way to revise through all the sections of Kubernetes.
 
 Courses:
 
