@@ -290,11 +290,12 @@
     <summary>Output</summary>
     <p>
 
+    ```bash
     $ k get cm cm3 -o yaml
     apiVersion: v1
     data:
-    ENV: developer1
-    SAFEMODE: "on"
+        ENV: developer1
+        SAFEMODE: "on"
     kind: ConfigMap
     metadata:
     ...
